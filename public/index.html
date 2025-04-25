@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎮 Portail de Jeux & Caméra</title>
+  <style>
+    html, body {
+      margin:0; padding:0;
+      height:100%; width:100%;
+      font-family: sans-serif;
+      background: #f0f0f0;
+      overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    h2 {
+      text-align: center;
+      margin: 1rem 0;
+    }
+    #gameSelector {
+      width: 90%; max-width: 300px;
+      margin: 0 auto 1rem;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+    #gameContainer {
+      flex: 1;
+      overflow-y: auto;
+      background: #fff;
+      padding: 10px;
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🎮 Choisis un jeu</h2>
+  <select id="gameSelector">
+    <option value="">-- Choisir un jeu --</option>
+  </select>
+
+  <div id="gameContainer">
+    <div id="gameContent"></div>
+  </div>
+
+  <!-- Signaling + médias -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/client.js"></script>
+
+  <!-- Loader de jeux -->
+  <script>
+    const gameList = [
+      { name: "Dino Runner", file: "dino", emoji: "🦖" },
+      { name: "Toilette Tycoon", file: "toilette", emoji: "🚽" },
+      { name: "Cri Chrono", file: "cri", emoji: "📢" },
+      { name: "Brosse Party", file: "brosse", emoji: "🪥" },
+      { name: "Profil Miroir", file: "miroir", emoji: "👤" },
+      { name: "Souffle Game", file: "souffle", emoji: "🎤" },
+      { name: "Tap Carré", file: "tapcarre", emoji: "🟥" }
+    ];
+  
+    const gameSelector = document.getElementById("gameSelector");
+    const gameContent = document.getElementById("gameContent");
+  
+    gameList.forEach(g => {
+      const opt = document.createElement("option");
+      opt.value = g.file;
+      opt.textContent = `${g.emoji} ${g.name}`;
+      gameSelector.appendChild(opt);
+    });
+  
+    gameSelector.addEventListener("change", async (e) => {
+      const selected = e.target.value;
+      if (!selected) {
+        gameContent.innerHTML = "";
+        return;
+      }
+  
+      console.log("[INDEX] Jeu sélectionné :", selected);
+      window.dispatchEvent(new Event("game-selected"));
+  
+      gameContent.innerHTML = "<p style='text-align:center'>Chargement...</p>";
+  
+      const script = document.createElement("script");
+      script.src = `/jeux/${selected}.js`;
+      script.onload = () => {
+        if (typeof window.initJeu === "function") {
+          console.log("[INDEX] Lancement du jeu");
+          window.initJeu();
+        } else {
+          gameContent.innerHTML = "<p style='color:red'>Erreur : initJeu() manquante</p>";
+        }
+      };
+      script.onerror = () => {
+        gameContent.innerHTML = `<p style="color:red;">Erreur de chargement du jeu "${selected}"</p>`;
+      };
+      document.body.appendChild(script);
+    });
+  </script>
+  
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Interface Admin</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+    video {
+      max-width: 100%;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎛️ Interface d'administration</h1>
+
+  <label for="clientSelect">📡 Choisir un client :</label>
+  <select id="clientSelect">
+    <option value="">-- Sélectionner un client --</option>
+  </select>
+
+  <div id="remoteVideosContainer"></div>
+
+  <!-- Socket + script admin -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/admin/admin.js" defer></script>
+</body>
+</html>
